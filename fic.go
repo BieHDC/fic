@@ -22,7 +22,7 @@ func main() {
 	a := app.NewWithID("biehdc.fic.v1") // i do not redeem the standard convention
 	w := a.NewWindow("Fast Image Cycler")
 
-	splash, cancel := makeSplash(a, w)
+	splash, cancel := makeSplash()
 	w.SetContent(splash)
 	go func() {
 		w.SetContent(makeMain(a, w))
@@ -57,7 +57,7 @@ func NewViewer() *Viewer {
 	return v
 }
 
-func makeSplash(a fyne.App, w fyne.Window) (fyne.CanvasObject, func()) {
+func makeSplash() (fyne.CanvasObject, func()) {
 	// fixme we should do something fancy here
 	// maybe once the app has a nice icon, we
 	// should use that
@@ -107,7 +107,7 @@ func makeMain(a fyne.App, w fyne.Window) fyne.CanvasObject {
 
 	// Point of Interest
 	// init everything that should be initted before buildup
-	statusbar := v.makeStatusbar(a, w)
+	statusbar := v.makeStatusbar()
 	v.initMainContainer()
 	v.imgplayer = ilp.NewImagePlayer()
 
@@ -140,10 +140,10 @@ func makeMain(a fyne.App, w fyne.Window) fyne.CanvasObject {
 		}
 	})
 
-	content := container.NewHSplit(v.makeLeft(a, w), v.makeViewer(a, w))
+	content := container.NewHSplit(v.makeLeft(), v.makeViewer())
 	content.SetOffset(0.3)
 	final := container.NewBorder(
-		v.makeMenubar(a, w),
+		v.makeMenubar(w),
 		statusbar,
 		nil,
 		nil,

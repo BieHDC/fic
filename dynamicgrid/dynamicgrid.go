@@ -62,19 +62,22 @@ func (g *dynamicGridLayout) biggestChild(objects []fyne.CanvasObject) fyne.Size 
 	return childsize
 }
 
-// fixme this needs a smarter implementation, but keep this one
-// until a better one is actually discovered
+func numobjfit(fullsize, childsize float32) int {
+	return max(int(math.Floor(float64(fullsize)/float64(childsize))), 1)
+}
+
+// fixme find a smart way to do this
 func oldCalcer(num int, childsize fyne.Size, size fyne.Size) (int, int) {
 	var numcols int
 	var numrows int
 	for {
 		childsize = childsize.Add(fyne.NewSquareSize(1))
-		numcols = max(int(math.Floor(float64(size.Width)/float64(childsize.Width))), 1)
-		numrows = max(int(math.Floor(float64(size.Height)/float64(childsize.Height))), 1)
+		numcols = numobjfit(size.Width, childsize.Width)
+		numrows = numobjfit(size.Height, childsize.Height)
 		if numcols*numrows <= num {
 			childsize = childsize.Subtract(fyne.NewSquareSize(1))
-			numcols = max(int(math.Floor(float64(size.Width)/float64(childsize.Width))), 1)
-			numrows = max(int(math.Floor(float64(size.Height)/float64(childsize.Height))), 1)
+			numcols = numobjfit(size.Width, childsize.Width)
+			numrows = numobjfit(size.Height, childsize.Height)
 			break
 		}
 	}
@@ -87,8 +90,8 @@ func oldCalcer(num int, childsize fyne.Size, size fyne.Size) (int, int) {
 // and if less content available to fill as much space as possible.
 func (g *dynamicGridLayout) Layout(objects []fyne.CanvasObject, size fyne.Size) {
 	childsize := g.biggestChild(objects)
-	numcols := max(int(math.Floor(float64(size.Width)/float64(childsize.Width))), 1)
-	numrows := max(int(math.Floor(float64(size.Height)/float64(childsize.Height))), 1)
+	numcols := numobjfit(size.Width, childsize.Width)
+	numrows := numobjfit(size.Height, childsize.Height)
 
 	maxamount := numrows * numcols
 	if !g.exhausted && (len(objects) < maxamount) {
@@ -102,26 +105,7 @@ func (g *dynamicGridLayout) Layout(objects []fyne.CanvasObject, size fyne.Size) 
 	}
 
 	if g.exhausted && (len(objects) < maxamount) {
-		ec, er := oldCalcer(len(objects), childsize, size)
-		numcols = ec
-		numrows = er
-		/*
-			fmt.Printf("expecting cols:%d rows:%d\n", ec, er)
-
-			// part 1 of the new code
-			// fmt.Printf("size of canvas: %f x %f\n", size.Width, size.Height)
-			formula := func(p, c float64) int {
-				delta := -math.Pow(c, 2) / (p + c)
-				xx := p / (c + delta)
-				fmt.Printf("\t%f\n", xx)
-				return int(xx)
-			}
-
-			numcols = formula(float64(size.Width), float64(childsize.Width))
-			numrows = formula(float64(size.Height), float64(childsize.Height))
-
-			fmt.Printf("got cols:%d rows:%d\n", numcols, numrows)
-		*/
+		numcols, numrows = oldCalcer(len(objects), childsize, size)
 		maxamount = numcols * numrows
 	}
 

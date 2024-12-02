@@ -123,15 +123,6 @@ func (md *MediaData) CacheImage(uri fyne.URI, maxfilesize int64) (*ImageDescript
 		}
 	}
 
-	imgdesc := ImageDescriptor{}
-	defer func() {
-		// works like charm
-		md.medialock.Lock()
-		md.mediacache[uristring] = imgdesc
-		//fmt.Println("cached", uri)
-		md.medialock.Unlock()
-	}()
-
 	file, err := os.Open(uri.Path())
 	if err != nil {
 		return nil, err
@@ -169,6 +160,15 @@ func (md *MediaData) CacheImage(uri fyne.URI, maxfilesize int64) (*ImageDescript
 		return nil, err
 	}
 	defer res.Close()
+
+	imgdesc := ImageDescriptor{}
+	defer func() {
+		// works like charm
+		md.medialock.Lock()
+		md.mediacache[uristring] = imgdesc
+		//fmt.Println("cached", uri)
+		md.medialock.Unlock()
+	}()
 
 	switch imageKind {
 	case "gif":

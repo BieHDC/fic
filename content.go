@@ -23,7 +23,7 @@ type Content struct {
 	selected      widget.TreeNodeID
 }
 
-func (v *Viewer) makeViewer(a fyne.App, w fyne.Window) fyne.CanvasObject {
+func (v *Viewer) makeViewer() fyne.CanvasObject {
 	r := canvas.NewImageFromResource(theme.BrokenImageIcon())
 	r.SetMinSize(fyne.NewSquareSize(256))
 	r.FillMode = canvas.ImageFillContain
@@ -47,7 +47,7 @@ func (v *Viewer) initMainContainer() {
 	v.mainContainer = container.NewStack()
 }
 
-func (v *Viewer) makeLeft(a fyne.App, w fyne.Window) fyne.CanvasObject {
+func (v *Viewer) makeLeft() fyne.CanvasObject {
 	v.InitialiseImageCache()
 
 	parentinfo := func(uri fyne.URI) (int, int) {

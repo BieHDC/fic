@@ -42,7 +42,7 @@ func (ft *Filetreemaps) addEntryNotLocked(parent, id string, val fyne.URI, prepe
 	ft.Values[id] = val
 }
 
-func (ft *Filetreemaps) merge(parentfolder, childfolder string, cft *Filetreemaps, childuri fyne.URI) {
+func (ft *Filetreemaps) merge(childfolder string, cft *Filetreemaps, childuri fyne.URI) {
 	ft.mu.Lock()
 	// dont need to lock the child, it has to be finished before merge
 
@@ -72,7 +72,7 @@ func Fillfiletree(parent string, dir fyne.ListableURI, root string) (*Filetreema
 	}
 	sem = nil
 
-	ft.merge(binding.DataTreeRootID, dir.String(), cft, dir)
+	ft.merge(dir.String(), cft, dir)
 
 	return ft, time.Since(start).Seconds()
 }
@@ -137,7 +137,7 @@ func (ft *Filetreemaps) walkdirectory(parentfolder string, dir fyne.ListableURI,
 			cft := newFiletreemaps()
 			<-sem
 			cft.walkdirectory(folder.nodeID, folder.uri, sem)
-			ft.merge(folder.parentfolder, folder.nodeID, cft, folder.uri)
+			ft.merge(folder.nodeID, cft, folder.uri)
 			//lets help the gc a little out
 			cft.Nil()
 			cft = nil

@@ -85,6 +85,7 @@ func (gp *GPlayer) play() {
 	}
 }
 
+// fixme technically wrong, doesnt correctly overflow
 func (gp *GPlayer) move(offset int) {
 	gp.index += offset
 

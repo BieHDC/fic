@@ -1,6 +1,5 @@
 ## fixme
 - grep for the various 'fixme's
-- nothing has tests
 - find a nice person to make a proper icon
 
 ---

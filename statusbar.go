@@ -18,10 +18,6 @@ type Statusbar struct {
 	memusage        binding.String
 }
 
-func bToMb(b uint) uint {
-	return b / 1024 / 1024
-}
-
 func (v *Viewer) setFileNumber(cf, sum int) {
 	v.xoutofy.Set(fmt.Sprintf("(%d/%d)", cf+1, sum))
 }
@@ -43,7 +39,7 @@ func (v *Viewer) refreshMemoryUsage() uint {
 	return uint(rampc)
 }
 
-func (v *Viewer) makeStatusbar(a fyne.App, w fyne.Window) fyne.CanvasObject {
+func (v *Viewer) makeStatusbar() fyne.CanvasObject {
 	v.currentfilename = binding.NewString()
 	v.currentfilename.Set("None Selected")
 	v.xoutofy = binding.NewString()

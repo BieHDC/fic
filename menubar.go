@@ -41,7 +41,7 @@ func newContextMenuButton(label string, menu *fyne.Menu) *contextMenuButton {
 	return b
 }
 
-func (v *Viewer) makeMenu(a fyne.App, w fyne.Window) fyne.CanvasObject {
+func (v *Viewer) makeMenu(w fyne.Window) fyne.CanvasObject {
 	setNewFolder := func(lu fyne.ListableURI) {
 		v.InvalidateImageCache()
 		v.rootdir = lu
@@ -93,7 +93,7 @@ func (v *Viewer) makeMenu(a fyne.App, w fyne.Window) fyne.CanvasObject {
 	})
 
 	subfolders := widget.NewCheck("", func(_ bool) {})
-	threads := newNumEntry() //fixme on save clamp > 0
+	threads := newNumEntry()
 	workers := func() uint {
 		asuint, err := strconv.Atoi(threads.Text)
 		if err != nil {
@@ -101,7 +101,7 @@ func (v *Viewer) makeMenu(a fyne.App, w fyne.Window) fyne.CanvasObject {
 		}
 		return uint(max(1, asuint))
 	}
-	maxfilesize := newNumEntry() //fixme on save clamp > 0
+	maxfilesize := newNumEntry()
 	filesize := func() uint {
 		asuint, err := strconv.Atoi(maxfilesize.Text)
 		if err != nil {
@@ -161,7 +161,7 @@ func (v *Viewer) makeMenu(a fyne.App, w fyne.Window) fyne.CanvasObject {
 	return menu
 }
 
-func (v *Viewer) makeMenubar(a fyne.App, w fyne.Window) fyne.CanvasObject {
+func (v *Viewer) makeMenubar(w fyne.Window) fyne.CanvasObject {
 	prev := widget.NewButtonWithIcon("Previous", theme.NavigateBackIcon(), func() { v.imgplayer.Previous() })
 	next := widget.NewButtonWithIcon("Next", theme.NavigateNextIcon(), func() { v.imgplayer.Next() })
 
@@ -176,7 +176,7 @@ func (v *Viewer) makeMenubar(a fyne.App, w fyne.Window) fyne.CanvasObject {
 	playpause = widget.NewButtonWithIcon("Play", theme.MediaPlayIcon(), func() {
 		if v.imgplayer.PlayPause() {
 			//is playing
-			playpause.SetText("Resume")
+			playpause.SetText("Pause")
 			playpause.SetIcon(theme.MediaPauseIcon())
 		} else {
 			//is stopped
@@ -240,11 +240,13 @@ func (v *Viewer) makeMenubar(a fyne.App, w fyne.Window) fyne.CanvasObject {
 	}
 
 	v.imgplayer.SetOnFrameFunc(func(index int, data []string, block bool) {
+		if index >= len(data) {
+			index = 0
+		}
+		
 		seeker.SetValue(float64(index))
 		seeker.Refresh()
 		//we unselect, so we can reclick the folder to display the preview
-		//luckily a visual highlight remains, otherwise we would need
-		//a trick to keep it visually highlighed
 		v.filetree.UnselectAll()
 
 		uri, ok := v.filetreedata.Values[data[index]]
@@ -286,6 +288,7 @@ func (v *Viewer) makeMenubar(a fyne.App, w fyne.Window) fyne.CanvasObject {
 			ramusedpercent := v.refreshMemoryUsage()
 			if ramusedpercent > 80 {
 				precache.Importance = widget.DangerImportance
+				runtime.GC() // lets pressure the gc a little
 			} else {
 				precache.Importance = widget.MediumImportance
 			}
@@ -297,7 +300,7 @@ func (v *Viewer) makeMenubar(a fyne.App, w fyne.Window) fyne.CanvasObject {
 		container.NewBorder(
 			nil, nil,
 			container.NewHBox(
-				v.makeMenu(a, w),
+				v.makeMenu(w),
 				precache,
 				prev,
 				next,

@@ -4,5 +4,5 @@ Website = "https://github.com/BieHDC/fic"
   Icon = "ficicon.png"
   Name = "Fast Image Cycler"
   ID = "biehdc.fic.v1"
-  Version = "0.1.0"
+  Version = "0.1.1"
   Build = 1
